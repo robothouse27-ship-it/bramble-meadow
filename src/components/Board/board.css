@@ -1,0 +1,98 @@
+.sudoku-frame {
+  position: relative;
+  padding: 12px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(160deg, var(--color-wood-light), var(--color-wood) 55%, var(--color-wood-dark));
+  box-shadow: var(--shadow-card-lifted);
+}
+
+.frame-leaf {
+  position: absolute;
+  font-size: 22px;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+  z-index: 2;
+}
+.frame-leaf-tl {
+  top: -10px;
+  left: -8px;
+  transform: rotate(-30deg);
+}
+.frame-leaf-tr {
+  top: -10px;
+  right: -8px;
+  transform: rotate(30deg) scaleX(-1);
+}
+.frame-leaf-bl {
+  bottom: -10px;
+  left: -8px;
+  transform: rotate(150deg) scaleX(-1);
+}
+.frame-leaf-br {
+  bottom: -10px;
+  right: -8px;
+  transform: rotate(-150deg);
+}
+
+.sudoku-board {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
+  width: min(88vw, 496px);
+  aspect-ratio: 1 / 1;
+  background: var(--color-paper);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-inset);
+  overflow: hidden;
+}
+
+.sudoku-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(90, 60, 30, 0.12);
+  font-size: clamp(16px, 3.6vw, 26px);
+  font-weight: 700;
+  transition: background 0.15s ease;
+  aspect-ratio: 1 / 1;
+}
+
+.sudoku-cell:hover {
+  background: var(--color-peer-bg);
+}
+
+.cell-given {
+  color: var(--color-clue);
+}
+
+.cell-entry {
+  color: var(--color-entry);
+}
+
+.cell-notes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+  padding: 3px;
+}
+
+.cell-note {
+  font-size: clamp(7px, 1.5vw, 10px);
+  font-weight: 700;
+  color: var(--color-ink-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cell-glow {
+  position: absolute;
+  inset: -2px;
+  border-radius: 6px;
+  background: radial-gradient(circle, #fff7db 0%, var(--color-honey-light) 45%, var(--color-honey) 70%, transparent 100%);
+  box-shadow: 0 0 12px 2px var(--color-honey-glow);
+  pointer-events: none;
+  z-index: 2;
+}

@@ -1,0 +1,86 @@
+.celebration-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(40, 28, 20, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.celebration-card {
+  position: relative;
+  background: linear-gradient(180deg, #fffdf7, var(--color-paper-warm));
+  border-radius: var(--radius-xl);
+  padding: 30px 28px 28px;
+  text-align: center;
+  box-shadow: var(--shadow-card-lifted);
+  width: min(88vw, 360px);
+  border: 3px solid var(--color-honey-light);
+}
+
+.celebration-sparkle {
+  position: absolute;
+  height: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px rgba(255, 220, 140, 0.7));
+  z-index: 51;
+}
+
+.celebration-banner {
+  position: relative;
+  width: min(74vw, 268px);
+  margin: 0 auto 4px;
+}
+
+.celebration-banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 4px 6px rgba(74, 55, 40, 0.3));
+}
+
+.celebration-banner-text {
+  position: absolute;
+  top: 46%;
+  left: 46%;
+  transform: translate(-50%, -50%);
+  width: 74%;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(15px, 4.4vw, 20px);
+  line-height: 1.1;
+  color: #fff4dc;
+  text-shadow: 0 2px 2px rgba(60, 38, 20, 0.75), 0 0 1px rgba(60, 38, 20, 0.9);
+}
+
+.celebration-stats {
+  color: var(--color-ink-soft);
+  margin-bottom: 22px;
+  font-weight: 600;
+}
+
+.celebration-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.celebration-btn {
+  padding: 13px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-family: var(--font-display);
+  background: linear-gradient(180deg, #fffdf7, var(--color-paper));
+  border: none;
+  border-bottom: 3px solid var(--color-ink-faint);
+  color: var(--color-ink-soft);
+  box-shadow: var(--shadow-button);
+}
+
+.celebration-btn.primary {
+  background: linear-gradient(180deg, #ffc86b, var(--color-honey));
+  border-bottom-color: #c47f1e;
+  color: white;
+}

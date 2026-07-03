@@ -1,0 +1,135 @@
+.menu-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 20px 40px;
+  text-align: center;
+}
+
+.menu-poster-frame {
+  position: relative;
+  margin-top: 4px;
+  padding: 8px;
+  background: linear-gradient(160deg, #fffdf7, var(--color-paper-warm));
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card-lifted), inset 0 0 0 2px rgba(184, 123, 74, 0.25);
+}
+
+.menu-poster {
+  display: block;
+  width: min(76vw, 300px);
+  max-height: 46vh;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+}
+
+.menu-leaf {
+  position: absolute;
+  width: 46px;
+  height: auto;
+  filter: drop-shadow(0 3px 4px rgba(74, 55, 40, 0.25));
+  pointer-events: none;
+}
+.menu-leaf-left {
+  top: -16px;
+  left: -14px;
+  transform: rotate(-28deg);
+}
+.menu-leaf-right {
+  bottom: -14px;
+  right: -14px;
+  transform: rotate(150deg);
+}
+
+.leaf-divider {
+  margin: 10px 0 4px;
+  opacity: 0.9;
+}
+
+.menu-subtitle {
+  color: var(--color-ink);
+  margin-bottom: 24px;
+  font-weight: 700;
+  display: inline-block;
+  max-width: min(88vw, 380px);
+  padding: 8px 18px;
+  border-radius: 18px;
+  background: rgba(253, 243, 223, 0.78);
+  backdrop-filter: blur(2px);
+  text-shadow: 0 1px 2px rgba(255, 250, 240, 0.9);
+}
+
+.menu-resume {
+  width: min(92vw, 420px);
+  padding: 14px;
+  margin-bottom: 22px;
+  background: linear-gradient(180deg, #97c56e, var(--color-leaf));
+  color: white;
+  border-radius: var(--radius-lg);
+  font-weight: 800;
+  font-family: var(--font-display);
+  box-shadow: var(--shadow-button);
+  border: 2px solid var(--color-leaf-dark);
+}
+
+.menu-difficulties {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(92vw, 420px);
+}
+
+.menu-difficulty-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: linear-gradient(160deg, #fffdf7, var(--color-paper-warm));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  text-align: left;
+  border-left: 6px solid var(--accent, var(--color-honey));
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-difficulty-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 90% -10%, var(--accent, var(--color-honey)) 0%, transparent 45%);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.menu-difficulty-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  box-shadow: var(--shadow-inset);
+}
+
+.menu-difficulty-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.menu-difficulty-label {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-clue);
+}
+
+.menu-difficulty-blurb {
+  color: var(--color-ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+}

@@ -1,0 +1,38 @@
+.controls-row {
+  display: flex;
+  gap: 10px;
+  width: min(88vw, 496px);
+  margin-top: 14px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 11px 8px;
+  background: linear-gradient(180deg, #fffdf7, var(--color-paper));
+  border: none;
+  border-bottom: 3px solid var(--color-ink-faint);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: var(--color-ink-soft);
+  box-shadow: var(--shadow-button);
+  transition: box-shadow 0.1s ease, transform 0.1s ease;
+}
+
+.control-btn:active:not(:disabled) {
+  box-shadow: var(--shadow-button-pressed);
+  transform: translateY(3px);
+}
+
+.control-btn.active {
+  background: linear-gradient(180deg, #fff2cf, var(--color-honey-light));
+  border-bottom-color: var(--color-honey);
+  color: var(--color-clue);
+}
+
+.control-btn:disabled {
+  opacity: 0.35;
+  box-shadow: none;
+  border-bottom-color: transparent;
+}

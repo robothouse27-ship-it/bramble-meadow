@@ -1,0 +1,72 @@
+.number-pad {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 7px;
+  width: min(92vw, 512px);
+  margin-top: 16px;
+  padding: 10px;
+  background: rgba(255, 250, 240, 0.82);
+  backdrop-filter: blur(3px);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.number-key {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: linear-gradient(180deg, #fffdf7, var(--color-paper-warm));
+  border: none;
+  border-bottom: 3px solid var(--color-honey-light);
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  color: var(--color-clue);
+  box-shadow: var(--shadow-button);
+  transition: box-shadow 0.1s ease, transform 0.1s ease;
+}
+
+.key-digit {
+  font-size: clamp(16px, 3vw, 22px);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.key-remaining {
+  font-size: clamp(8px, 1.6vw, 10px);
+  font-weight: 700;
+  line-height: 1;
+  margin-top: 2px;
+  color: var(--color-ink-faint);
+}
+
+.number-key:active:not(:disabled) {
+  box-shadow: var(--shadow-button-pressed);
+  transform: translateY(3px);
+}
+
+.number-key:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+  border-bottom-color: transparent;
+}
+
+.number-key.notes {
+  background: linear-gradient(180deg, #e8f2dc, var(--color-selected-bg));
+  border-bottom-color: var(--color-leaf-dark);
+}
+
+/* all nine of this digit placed — a calm, satisfied "done" look */
+.number-key.done {
+  opacity: 0.72;
+  background: linear-gradient(180deg, #eef5e2, #dcebc8);
+  border-bottom-color: transparent;
+  color: var(--color-leaf-dark);
+}
+
+.number-key.done .key-remaining {
+  color: var(--color-leaf-dark);
+  font-size: clamp(9px, 1.8vw, 12px);
+}

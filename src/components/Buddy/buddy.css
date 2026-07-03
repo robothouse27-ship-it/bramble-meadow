@@ -1,0 +1,41 @@
+.buddy-panel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: min(88vw, 496px);
+  margin-bottom: 14px;
+}
+
+.buddy-bubble {
+  position: relative;
+  background: linear-gradient(160deg, #ffffff, var(--color-paper-warm));
+  border: 2px solid var(--color-honey-light);
+  border-radius: 20px;
+  padding: 12px 18px;
+  font-weight: 700;
+  color: var(--color-clue);
+  box-shadow: var(--shadow-card);
+  flex: 1;
+  margin-left: 10px;
+}
+
+.buddy-bubble .bubble-dot {
+  position: absolute;
+  background: var(--color-paper-warm);
+  border: 2px solid var(--color-honey-light);
+  border-radius: 50%;
+}
+
+.buddy-bubble .bubble-dot-1 {
+  width: 12px;
+  height: 12px;
+  left: -16px;
+  bottom: 6px;
+}
+
+.buddy-bubble .bubble-dot-2 {
+  width: 7px;
+  height: 7px;
+  left: -26px;
+  bottom: 0;
+}

@@ -1,0 +1,40 @@
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--color-sky-top) 0%,
+    var(--color-paper-warm) 45%
+  );
+}
+
+.scene-meadow {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: cover;
+}
+
+/* soft cream wash over the sky so the top HUD/title stays legible and the
+   illustration melts into the page */
+.scene-skyfade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    var(--color-paper-warm) 0%,
+    rgba(253, 243, 223, 0.55) 12%,
+    rgba(253, 243, 223, 0) 32%
+  );
+}
+
+@media (min-aspect-ratio: 1/1) {
+  /* on wide screens show more of the scene, anchored to the bottom */
+  .scene-meadow {
+    background-size: 100% auto;
+  }
+}

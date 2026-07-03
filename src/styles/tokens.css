@@ -1,0 +1,64 @@
+:root {
+  /* Meadow palette — warm, sunlit, storybook */
+  --color-sky-top: #fff3d6;
+  --color-sky-bottom: #ffe3b0;
+  --color-meadow-dusk-top: #4a3b6b;
+  --color-meadow-dusk-bottom: #8a5a7a;
+  --color-meadow-night-top: #1a1633;
+  --color-meadow-night-bottom: #2e2352;
+
+  --color-paper: #fffaf0;
+  --color-paper-warm: #fdf3df;
+  --color-ink: #4a3728;
+  --color-ink-soft: #7a6455;
+  --color-ink-faint: #b5a48f;
+
+  --color-clue: #6b4f3a;
+  --color-entry: #c2703a;
+  --color-conflict: #d4574a;
+  --color-conflict-bg: #fbe2df;
+
+  --color-honey: #f2a740;
+  --color-honey-light: #ffd479;
+  --color-honey-glow: #ffe9b8;
+  --color-leaf: #7fa856;
+  --color-leaf-dark: #5c8340;
+  --color-berry: #c2506a;
+  --color-berry-lost: #d8cfc2;
+
+  --color-peer-bg: #fbe9c9;
+  --color-same-bg: #f6d9a0;
+  --color-selected-bg: #f2c46b;
+
+  /* Scene / illustration palette */
+  --color-sun: #ffe9a8;
+  --color-sun-core: #fff6dd;
+  --color-hill-far: #cfe0a0;
+  --color-hill-mid: #a9cf7c;
+  --color-hill-near: #7fb85c;
+  --color-hill-near-shadow: #5f9a45;
+  --color-tree-trunk: #8a5f3e;
+  --color-cloud: rgba(255, 255, 255, 0.75);
+
+  --color-wood: #b97b4a;
+  --color-wood-dark: #8a5a34;
+  --color-wood-light: #d99c66;
+  --color-rope: #c9a876;
+
+  --font-display: "Fredoka", "Baloo 2", ui-rounded, "Segoe UI Rounded", sans-serif;
+  --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 32px;
+
+  --shadow-soft: 0 4px 14px rgba(90, 60, 30, 0.12);
+  --shadow-card: 0 10px 30px rgba(90, 60, 30, 0.16);
+  --shadow-card-lifted: 0 16px 40px rgba(90, 60, 30, 0.22);
+  --shadow-inset: inset 0 1px 3px rgba(90, 60, 30, 0.15);
+  --shadow-button: 0 4px 0 rgba(90, 60, 30, 0.25), 0 6px 14px rgba(90, 60, 30, 0.18);
+  --shadow-button-pressed: 0 1px 0 rgba(90, 60, 30, 0.25), 0 2px 6px rgba(90, 60, 30, 0.15);
+
+  color-scheme: light;
+}
