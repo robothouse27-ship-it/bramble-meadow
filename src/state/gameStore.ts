@@ -57,6 +57,7 @@ interface GameState {
   undo: () => void;
   tick: () => void;
   setBuddy: (mood: BuddyMood, line?: string) => void;
+  idleNudge: () => void;
   backToMenu: () => void;
 }
 
@@ -121,6 +122,21 @@ const COMBO_LINES = [
   "The meadow's positively glowing!",
   "Unstoppable little sprout!",
   "Petals everywhere — keep going!",
+];
+
+const IDLE_LINES = [
+  "Take your time — the meadow's patient.",
+  "Stuck? Try the emptiest burrow first.",
+  "Hmm… where could that little one fit?",
+  "A deep breath of meadow air always helps.",
+  "No rush. The brambles aren't going anywhere.",
+];
+
+const ALMOST_LINES = [
+  "So close — the meadow's nearly in bloom!",
+  "Just a petal or two to go!",
+  "Almost there, little gardener!",
+  "The last few burrows are waiting!",
 ];
 
 function pick<T>(arr: T[]): T {
@@ -289,11 +305,14 @@ export const useGameStore = create<GameState>()(
           hapticTap();
         }
 
+        const emptyLeft = values.filter((v) => v === 0).length;
         const buddyLine = won
           ? "You did it! What a beautiful meadow."
-          : completedKind && newCombo >= 2
-            ? pick(COMBO_LINES)
-            : pick(HAPPY_LINES);
+          : emptyLeft > 0 && emptyLeft <= 5
+            ? pick(ALMOST_LINES)
+            : completedKind && newCombo >= 2
+              ? pick(COMBO_LINES)
+              : pick(HAPPY_LINES);
 
         set({
           values,
@@ -316,6 +335,12 @@ export const useGameStore = create<GameState>()(
       },
 
       setBuddy: (mood, line) => set({ buddyMood: mood, ...(line ? { buddyLine: line } : {}) }),
+
+      idleNudge: () => {
+        const s = get();
+        if (s.status !== "playing") return;
+        set({ buddyMood: "thinking", buddyLine: pick(IDLE_LINES) });
+      },
     }),
     {
       name: "bramble-meadow-save",

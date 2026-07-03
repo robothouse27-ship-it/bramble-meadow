@@ -161,6 +161,14 @@ concept art via ChatGPT and handed off 9 PNGs. Integrated:
   + `.number-key.done`).
 - Verified in-headless: remaining counters render cleanly; app + lint green.
 
+**Polish pass — Pip liveliness (2026-07-03, scripted):**
+- **Idle nudge:** after ~22s of no input, Pip switches to the `thinking` mood and
+  offers a gentle hint-flavored line (`idleNudge` action + `IDLE_LINES`); the
+  timer resets on any move/selection/status change (effect in `GameScreen`).
+  Verified live in headless (idle → "thinking" pose + idle line after 23s).
+- **"Almost there" moment:** when ≤5 cells remain, Pip gets excited
+  (`ALMOST_LINES`), prioritized over combo/happy lines. Build-verified.
+
 **Open thread — richer character art:** no image-generation tool is connected in
 this workspace, so painted/illustrated art isn't something Claude can produce
 directly. Plan: Benji generates concept art via his ChatGPT account, hands off

@@ -13,11 +13,21 @@ export function GameScreen() {
   const eraseCell = useGameStore((s) => s.eraseCell);
   const selectCell = useGameStore((s) => s.selectCell);
   const selected = useGameStore((s) => s.selected);
+  const values = useGameStore((s) => s.values);
   const lastCompletion = useGameStore((s) => s.lastCompletion);
   const status = useGameStore((s) => s.status);
   const combo = useGameStore((s) => s.combo);
+  const idleNudge = useGameStore((s) => s.idleNudge);
 
   const boardCenterRef = useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+
+  // Pip gently pipes up after a stretch of inactivity. The timer resets on any
+  // move (values), selection change, or status change.
+  useEffect(() => {
+    if (status !== "playing") return;
+    const t = setTimeout(idleNudge, 22000);
+    return () => clearTimeout(t);
+  }, [values, selected, status, idleNudge]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
