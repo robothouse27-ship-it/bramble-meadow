@@ -7,6 +7,11 @@ function getCtx(): AudioContext {
   return ctx;
 }
 
+/** Shared AudioContext, so chimes and the ambient bed share one graph. */
+export function getAudioContext(): AudioContext {
+  return getCtx();
+}
+
 /** A single voice: a warm sine with a quieter triangle overtone for body. */
 function tone(
   freq: number,

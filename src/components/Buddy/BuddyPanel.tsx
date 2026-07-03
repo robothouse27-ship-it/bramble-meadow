@@ -6,10 +6,19 @@ import "./buddy.css";
 export function BuddyPanel() {
   const mood = useGameStore((s) => s.buddyMood);
   const line = useGameStore((s) => s.buddyLine);
+  const pokePip = useGameStore((s) => s.pokePip);
 
   return (
     <div className="buddy-panel">
-      <Pip mood={mood} size={88} />
+      <motion.button
+        type="button"
+        className="buddy-pip-btn"
+        onClick={pokePip}
+        whileTap={{ scale: 0.9, rotate: -6 }}
+        aria-label="Pet Pip"
+      >
+        <Pip mood={mood} size={88} />
+      </motion.button>
       <AnimatePresence mode="wait">
         <motion.div
           key={line}

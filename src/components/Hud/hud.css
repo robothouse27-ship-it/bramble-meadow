@@ -40,11 +40,29 @@
   font-variant-numeric: tabular-nums;
 }
 
+.hud-sound {
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-peer-bg);
+  border-radius: 50%;
+  box-shadow: var(--shadow-inset);
+  flex-shrink: 0;
+  transition: transform 0.1s ease;
+}
+.hud-sound:active {
+  transform: scale(0.9);
+}
+
 .hud-berries {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-left: auto;
+  margin-left: 8px;
 }
 
 .berry {

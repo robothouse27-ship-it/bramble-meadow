@@ -4,11 +4,17 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    var(--color-sky-top) 0%,
-    var(--color-paper-warm) 45%
-  );
+
+  /* per-phase variables (defaults = day) */
+  --sky-a: var(--color-sky-top);
+  --sky-b: var(--color-paper-warm);
+  --tint: transparent;
+  --tint-blend: normal;
+  --meadow-filter: none;
+  --fade: rgba(253, 243, 223, 0.55);
+
+  background: linear-gradient(180deg, var(--sky-a) 0%, var(--sky-b) 45%);
+  transition: background 1.6s ease;
 }
 
 .scene-meadow {
@@ -17,23 +23,56 @@
   background-repeat: no-repeat;
   background-position: center bottom;
   background-size: cover;
+  filter: var(--meadow-filter);
+  transition: filter 1.6s ease;
 }
 
-/* soft cream wash over the sky so the top HUD/title stays legible and the
-   illustration melts into the page */
+/* time-of-day wash over the whole scene (sky + meadow) */
+.scene-tint {
+  position: absolute;
+  inset: 0;
+  background: var(--tint);
+  mix-blend-mode: var(--tint-blend);
+  transition: background 1.6s ease;
+}
+
+/* soft top wash so the HUD/title stay legible against the sky */
 .scene-skyfade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    var(--color-paper-warm) 0%,
-    rgba(253, 243, 223, 0.55) 12%,
-    rgba(253, 243, 223, 0) 32%
-  );
+  background: linear-gradient(180deg, var(--fade) 0%, rgba(253, 243, 223, 0) 32%);
+}
+
+/* ---- phases ---- */
+.scene--morning {
+  --sky-a: #ffe9c4;
+  --sky-b: var(--color-paper-warm);
+  --tint: rgba(255, 210, 140, 0.16);
+  --tint-blend: soft-light;
+  --fade: rgba(255, 244, 224, 0.5);
+}
+
+/* day = defaults */
+
+.scene--dusk {
+  --sky-a: var(--color-meadow-dusk-top);
+  --sky-b: var(--color-meadow-dusk-bottom);
+  --tint: rgba(122, 68, 128, 0.34);
+  --tint-blend: multiply;
+  --meadow-filter: brightness(0.86) saturate(1.05) hue-rotate(-6deg);
+  --fade: transparent;
+}
+
+.scene--night {
+  --sky-a: var(--color-meadow-night-top);
+  --sky-b: var(--color-meadow-night-bottom);
+  --tint: rgba(30, 26, 62, 0.5);
+  --tint-blend: multiply;
+  --meadow-filter: brightness(0.6) saturate(0.85) hue-rotate(-10deg);
+  --fade: transparent;
 }
 
 @media (min-aspect-ratio: 1/1) {
-  /* on wide screens show more of the scene, anchored to the bottom */
   .scene-meadow {
     background-size: 100% auto;
   }

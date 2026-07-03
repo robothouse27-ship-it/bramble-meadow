@@ -19,6 +19,8 @@ export function Hud() {
   const tick = useGameStore((s) => s.tick);
   const difficulty = useGameStore((s) => s.difficulty);
   const backToMenu = useGameStore((s) => s.backToMenu);
+  const ambientOn = useGameStore((s) => s.ambientOn);
+  const toggleAmbient = useGameStore((s) => s.toggleAmbient);
 
   useEffect(() => {
     const id = setInterval(tick, 1000);
@@ -32,6 +34,14 @@ export function Hud() {
       </button>
       <div className="hud-difficulty">{difficulty}</div>
       <div className="hud-timer">⏱ {formatTime(elapsedMs)}</div>
+      <button
+        className="hud-sound"
+        onClick={toggleAmbient}
+        aria-label={ambientOn ? "Mute meadow sounds" : "Unmute meadow sounds"}
+        aria-pressed={ambientOn}
+      >
+        {ambientOn ? "🔊" : "🔇"}
+      </button>
       <div className="hud-berries" aria-label={`${MAX_MISTAKES - mistakes} berries left`}>
         {Array.from({ length: MAX_MISTAKES }, (_, i) => {
           const alive = i < MAX_MISTAKES - mistakes;

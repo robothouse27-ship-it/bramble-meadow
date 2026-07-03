@@ -169,6 +169,22 @@ concept art via ChatGPT and handed off 9 PNGs. Integrated:
 - **"Almost there" moment:** when ≤5 cells remain, Pip gets excited
   (`ALMOST_LINES`), prioritized over combo/happy lines. Build-verified.
 
+**Feel & immersion pass (2026-07-03):**
+- **Day/night meadow:** the scene shifts with real local time — morning (golden),
+  day, dusk (mauve twilight), night (moonlit indigo) — via per-phase CSS vars on
+  `Scene` using the dusk/night tokens + a blend-mode tint over the meadow art.
+  `?time=night|dusk|morning|day` forces a phase for preview.
+- **Ambient soundscape:** generative Web Audio meadow bed (`audio/ambient.ts`) —
+  breathing filtered-noise wind + occasional birdsong chirps, fade in/out. Starts
+  while playing, gated by a persisted `ambientOn` toggle (🔊/🔇 in the HUD).
+- **Tap-Pip:** petting Pip (`buddy-pip-btn`) triggers a wiggle + a random tap line
+  (`pokePip` + `PIP_TAP_LINES`).
+- **Pip idle stretch:** `Pip` now runs on `useAnimationControls`; while idle he
+  occasionally does a stretch/yawn over the breathing loop (every 12–24s).
+- **Screen transition:** menu ↔ game now cross-fades/drifts via AnimatePresence
+  (`App.tsx` + `.screen-swap`).
+- All verified in headless; tsc + lint clean.
+
 **Open thread — richer character art:** no image-generation tool is connected in
 this workspace, so painted/illustrated art isn't something Claude can produce
 directly. Plan: Benji generates concept art via his ChatGPT account, hands off

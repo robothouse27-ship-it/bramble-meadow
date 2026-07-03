@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useGameStore } from "../state/gameStore";
+import { startAmbient, stopAmbient } from "../audio/ambient";
 import { Hud } from "./Hud/Hud";
 import { BuddyPanel } from "./Buddy/BuddyPanel";
 import { Board } from "./Board/Board";
@@ -18,8 +19,16 @@ export function GameScreen() {
   const status = useGameStore((s) => s.status);
   const combo = useGameStore((s) => s.combo);
   const idleNudge = useGameStore((s) => s.idleNudge);
+  const ambientOn = useGameStore((s) => s.ambientOn);
 
   const boardCenterRef = useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+
+  // ambient meadow soundscape while actively playing (respects the toggle)
+  useEffect(() => {
+    if (status === "playing" && ambientOn) startAmbient();
+    else stopAmbient();
+    return () => stopAmbient();
+  }, [status, ambientOn]);
 
   // Pip gently pipes up after a stretch of inactivity. The timer resets on any
   // move (values), selection change, or status change.

@@ -46,6 +46,8 @@ interface GameState {
   combo: number; // consecutive clean line/box completions
   lastCompletion: CompletionEvent | null;
 
+  ambientOn: boolean; // ambient meadow soundscape preference
+
   history: HistoryEntry[];
 
   startGame: (difficulty: Difficulty) => void;
@@ -58,6 +60,8 @@ interface GameState {
   tick: () => void;
   setBuddy: (mood: BuddyMood, line?: string) => void;
   idleNudge: () => void;
+  pokePip: () => void;
+  toggleAmbient: () => void;
   backToMenu: () => void;
 }
 
@@ -139,6 +143,16 @@ const ALMOST_LINES = [
   "The last few burrows are waiting!",
 ];
 
+const PIP_TAP_LINES = [
+  "Hee! That tickles.",
+  "Oh! Hello there.",
+  "Boop! 🌼",
+  "Careful of my quills!",
+  "*happy little squeak*",
+  "You found me!",
+  "Aww, hi friend.",
+];
+
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -164,6 +178,8 @@ export const useGameStore = create<GameState>()(
       buddyLine: "Ready when you are.",
       combo: 0,
       lastCompletion: null,
+
+      ambientOn: true,
 
       history: [],
 
@@ -341,6 +357,14 @@ export const useGameStore = create<GameState>()(
         if (s.status !== "playing") return;
         set({ buddyMood: "thinking", buddyLine: pick(IDLE_LINES) });
       },
+
+      pokePip: () => {
+        const s = get();
+        if (s.status !== "playing") return;
+        set({ buddyMood: "happy", buddyLine: pick(PIP_TAP_LINES) });
+      },
+
+      toggleAmbient: () => set((s) => ({ ambientOn: !s.ambientOn })),
     }),
     {
       name: "bramble-meadow-save",
@@ -354,6 +378,7 @@ export const useGameStore = create<GameState>()(
         mistakes: s.mistakes,
         status: s.status,
         elapsedMs: s.elapsedMs,
+        ambientOn: s.ambientOn,
       }),
     }
   )
