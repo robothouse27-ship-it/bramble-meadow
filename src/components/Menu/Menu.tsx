@@ -1,7 +1,8 @@
-import { motion } from "framer-motion";
-import type { ReactElement } from "react";
-import { useGameStore } from "../../state/gameStore";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState, type ReactElement } from "react";
+import { useGameStore, dayKey } from "../../state/gameStore";
 import type { Difficulty } from "../../engine/sudoku";
+import { StatsPanel } from "../Stats/StatsPanel";
 import poster from "../../assets/scene/poster.png";
 import leaf from "../../assets/props/leaf.png";
 import "./menu.css";
@@ -92,14 +93,33 @@ function LeafDivider() {
   );
 }
 
+// the streak "blooms" as it grows: sprout → tulip → blossom → sunflower
+function streakFlower(n: number): string {
+  if (n >= 30) return "🌻";
+  if (n >= 14) return "🌸";
+  if (n >= 7) return "🌷";
+  if (n >= 3) return "🌼";
+  return "🌱";
+}
+
 export function Menu() {
   const startGame = useGameStore((s) => s.startGame);
+  const startDaily = useGameStore((s) => s.startDaily);
   const status = useGameStore((s) => s.status);
   const resumeGame = useGameStore((s) => s.resumeGame);
   const difficulty = useGameStore((s) => s.difficulty);
   const puzzle = useGameStore((s) => s.puzzle);
+  const lastDailyDate = useGameStore((s) => s.lastDailyDate);
+  const dailyStreak = useGameStore((s) => s.dailyStreak);
+  const [showStats, setShowStats] = useState(false);
 
   const canResume = puzzle !== null && status === "menu" && difficulty !== null;
+  const today = dayKey();
+  const yesterday = dayKey(new Date(Date.now() - 86_400_000));
+  const dailyDone = lastDailyDate === today;
+  // a streak is "alive" only if the last completion was today or yesterday
+  const streakAlive = lastDailyDate === today || lastDailyDate === yesterday;
+  const streak = streakAlive ? dailyStreak : 0;
 
   return (
     <div className="menu-screen">
@@ -116,6 +136,34 @@ export function Menu() {
 
       <LeafDivider />
       <p className="menu-subtitle">A cozy sudoku, with Pip the hedgehog by your side.</p>
+
+      <motion.button
+        className={`menu-daily ${dailyDone ? "done" : ""}`}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 220, damping: 20 }}
+        whileTap={dailyDone ? undefined : { scale: 0.97, y: 2 }}
+        whileHover={dailyDone ? undefined : { y: -3 }}
+        onClick={() => !dailyDone && startDaily()}
+        disabled={dailyDone}
+      >
+        <span className="menu-daily-icon">{dailyDone ? "🌸" : "☀️"}</span>
+        <span className="menu-daily-text">
+          <span className="menu-daily-label">Daily Meadow{dailyDone ? " ✓" : ""}</span>
+          <span className="menu-daily-blurb">
+            {dailyDone
+              ? "Bloomed today — back tomorrow!"
+              : streak > 0
+                ? "Keep your bloom going!"
+                : "Today's puzzle for everyone"}
+          </span>
+        </span>
+        {streak > 0 && (
+          <span className="menu-daily-streak" title={`${streak}-day bloom`}>
+            {streakFlower(streak)} {streak}
+          </span>
+        )}
+      </motion.button>
 
       {canResume && (
         <motion.button
@@ -149,6 +197,14 @@ export function Menu() {
           </motion.button>
         ))}
       </div>
+
+      <button className="menu-progress" onClick={() => setShowStats(true)}>
+        🌿 Your progress
+      </button>
+
+      <AnimatePresence>
+        {showStats && <StatsPanel onClose={() => setShowStats(false)} />}
+      </AnimatePresence>
     </div>
   );
 }

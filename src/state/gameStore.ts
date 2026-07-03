@@ -4,6 +4,7 @@ import {
   generatePuzzle,
   getConflicts,
   isComplete,
+  makeRng,
   type Cell,
   type Difficulty,
   type Grid,
@@ -25,6 +26,34 @@ type HistoryEntry = {
   values: Grid;
   notes: number[][];
 };
+
+export interface Stats {
+  played: number; // games finished (won or lost)
+  won: number;
+  flawless: number; // wins with zero mistakes
+  best: { easy: number | null; medium: number | null; hard: number | null }; // best time ms
+}
+
+function emptyStats(): Stats {
+  return { played: 0, won: 0, flawless: 0, best: { easy: null, medium: null, hard: null } };
+}
+
+function recordOutcome(
+  stats: Stats,
+  outcome: { win: boolean; difficulty: Difficulty | null; mistakes: number; ms: number },
+): Stats {
+  const best = { ...stats.best };
+  if (outcome.win && outcome.difficulty) {
+    const cur = best[outcome.difficulty];
+    if (cur === null || outcome.ms < cur) best[outcome.difficulty] = outcome.ms;
+  }
+  return {
+    played: stats.played + 1,
+    won: stats.won + (outcome.win ? 1 : 0),
+    flawless: stats.flawless + (outcome.win && outcome.mistakes === 0 ? 1 : 0),
+    best,
+  };
+}
 
 interface GameState {
   difficulty: Difficulty | null;
@@ -48,9 +77,17 @@ interface GameState {
 
   ambientOn: boolean; // ambient meadow soundscape preference
 
+  stats: Stats;
+
+  isDaily: boolean; // current game is today's Daily Meadow
+  lastDailyDate: string | null; // YYYY-MM-DD of last completed daily
+  dailyStreak: number;
+  bestStreak: number;
+
   history: HistoryEntry[];
 
   startGame: (difficulty: Difficulty) => void;
+  startDaily: () => void;
   resumeGame: () => void;
   selectCell: (i: number) => void;
   enterDigit: (digit: number) => void;
@@ -68,6 +105,22 @@ interface GameState {
 function emptyNotes(): number[][] {
   return Array.from({ length: 81 }, () => []);
 }
+
+/** Local calendar day as YYYY-MM-DD (used to seed and track the daily puzzle). */
+export function dayKey(d = new Date()): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function seedFromKey(key: string): number {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < key.length; i++) {
+    h ^= key.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+const DAILY_DIFFICULTY: Difficulty = "medium";
 
 function linesForCell(i: number): { row: number[]; col: number[]; box: number[] } {
   const r = Math.floor(i / 9);
@@ -181,6 +234,13 @@ export const useGameStore = create<GameState>()(
 
       ambientOn: true,
 
+      stats: emptyStats(),
+
+      isDaily: false,
+      lastDailyDate: null,
+      dailyStreak: 0,
+      bestStreak: 0,
+
       history: [],
 
       startGame: (difficulty) => {
@@ -203,6 +263,32 @@ export const useGameStore = create<GameState>()(
           combo: 0,
           lastCompletion: null,
           history: [],
+          isDaily: false,
+        });
+      },
+
+      startDaily: () => {
+        const seed = seedFromKey("daily-" + dayKey());
+        const { puzzle, solution } = generatePuzzle(DAILY_DIFFICULTY, makeRng(seed));
+        set({
+          difficulty: DAILY_DIFFICULTY,
+          puzzle,
+          solution,
+          values: puzzle.slice(),
+          notes: emptyNotes(),
+          givenMask: puzzle.map((v) => v !== 0),
+          selected: null,
+          notesMode: false,
+          mistakes: 0,
+          status: "playing",
+          startedAt: Date.now(),
+          elapsedMs: 0,
+          buddyMood: "idle",
+          buddyLine: "Today's meadow awaits! 🌼",
+          combo: 0,
+          lastCompletion: null,
+          history: [],
+          isDaily: true,
         });
       },
 
@@ -276,6 +362,7 @@ export const useGameStore = create<GameState>()(
         notes[i] = [];
 
         const correct = s.solution[i] === digit;
+        const finalMs = Date.now() - (s.startedAt ?? Date.now());
 
         if (!correct) {
           playMistake();
@@ -291,6 +378,9 @@ export const useGameStore = create<GameState>()(
             buddyLine: lost ? "The meadow rests a while. Try again?" : pick(WORRIED_LINES),
             combo: 0,
             history: [...s.history, historyEntry].slice(-20),
+            ...(lost
+              ? { stats: recordOutcome(s.stats, { win: false, difficulty: s.difficulty, mistakes, ms: finalMs }) }
+              : {}),
           });
           return;
         }
@@ -323,12 +413,29 @@ export const useGameStore = create<GameState>()(
 
         const emptyLeft = values.filter((v) => v === 0).length;
         const buddyLine = won
-          ? "You did it! What a beautiful meadow."
+          ? s.isDaily
+            ? "Today's meadow bloomed! 🌸 See you tomorrow."
+            : "You did it! What a beautiful meadow."
           : emptyLeft > 0 && emptyLeft <= 5
             ? pick(ALMOST_LINES)
             : completedKind && newCombo >= 2
               ? pick(COMBO_LINES)
               : pick(HAPPY_LINES);
+
+        // Daily Meadow completion → advance the meadow-bloom streak (once per day)
+        const today = dayKey();
+        const dailyPatch =
+          won && s.isDaily && s.lastDailyDate !== today
+            ? (() => {
+                const yesterday = dayKey(new Date(Date.now() - 86400000));
+                const newStreak = s.lastDailyDate === yesterday ? s.dailyStreak + 1 : 1;
+                return {
+                  lastDailyDate: today,
+                  dailyStreak: newStreak,
+                  bestStreak: Math.max(s.bestStreak, newStreak),
+                };
+              })()
+            : {};
 
         set({
           values,
@@ -341,6 +448,10 @@ export const useGameStore = create<GameState>()(
             ? { id: Date.now(), kind: completedKind[0], cells: completedKind[1] }
             : s.lastCompletion,
           history: [...s.history, historyEntry].slice(-20),
+          ...(won
+            ? { stats: recordOutcome(s.stats, { win: true, difficulty: s.difficulty, mistakes: s.mistakes, ms: finalMs }) }
+            : {}),
+          ...dailyPatch,
         });
       },
 
@@ -379,6 +490,11 @@ export const useGameStore = create<GameState>()(
         status: s.status,
         elapsedMs: s.elapsedMs,
         ambientOn: s.ambientOn,
+        stats: s.stats,
+        isDaily: s.isDaily,
+        lastDailyDate: s.lastDailyDate,
+        dailyStreak: s.dailyStreak,
+        bestStreak: s.bestStreak,
       }),
     }
   )

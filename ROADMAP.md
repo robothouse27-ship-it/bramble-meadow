@@ -185,6 +185,21 @@ concept art via ChatGPT and handed off 9 PNGs. Integrated:
   (`App.tsx` + `.screen-swap`).
 - All verified in headless; tsc + lint clean.
 
+**Retention layer (2026-07-03):**
+- **Stats tracking:** persisted `stats` (played, won, flawless, best time per
+  difficulty); recorded on win/loss in the store.
+- **Daily Meadow:** date-seeded puzzle (`makeRng(seedFromKey(dayKey()))`) — same
+  for everyone each day; `startDaily()` + a menu card with done/not-done states.
+- **Meadow-bloom streak:** `dailyStreak`/`bestStreak` advance on consecutive daily
+  completions (broken if a day is missed); menu badge blooms 🌱→🌼→🌷→🌸→🌻.
+- **Stats screen** (`Stats/StatsPanel`): cozy modal from the menu ("🌿 Your
+  progress") — solved, win rate, flawless, streak, best times, best bloom.
+- **Achievements** (`achievements.ts`): 6 derived badges (First Bloom, Flawless,
+  Speedy Sprout, Thicket Tamer, Week of Blooms, Meadow Dweller) shown in the stats
+  panel, earned/locked.
+- All verified in headless (stats recording via full solve, daily determinism,
+  streak extend/break, panels). tsc + lint clean.
+
 **Open thread — richer character art:** no image-generation tool is connected in
 this workspace, so painted/illustrated art isn't something Claude can produce
 directly. Plan: Benji generates concept art via his ChatGPT account, hands off
