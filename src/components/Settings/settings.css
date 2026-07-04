@@ -1,0 +1,106 @@
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(40, 28, 20, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 70;
+  padding: 20px;
+}
+
+.settings-card {
+  background: linear-gradient(180deg, #fffdf7, var(--color-paper-warm));
+  border-radius: var(--radius-xl);
+  padding: 26px 22px 22px;
+  width: min(92vw, 380px);
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-card-lifted);
+  border: 3px solid var(--color-honey-light);
+  text-align: center;
+}
+
+.settings-title {
+  margin: 0 0 18px;
+  font-size: 24px;
+  color: var(--color-clue);
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 15px;
+  background: linear-gradient(160deg, #fffef9, var(--color-peer-bg));
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-inset);
+  text-align: left;
+}
+
+.setting-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.setting-label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--color-clue);
+}
+
+.setting-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+.setting-switch {
+  flex-shrink: 0;
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--color-ink-faint);
+  box-shadow: var(--shadow-inset);
+  transition: background 0.2s ease;
+}
+
+.setting-switch.on {
+  background: var(--color-leaf);
+}
+
+.setting-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fffdf7;
+  box-shadow: 0 1px 3px rgba(74, 55, 40, 0.4);
+}
+
+.settings-close {
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-family: var(--font-display);
+  background: linear-gradient(180deg, #97c56e, var(--color-leaf));
+  color: white;
+  border: none;
+  border-bottom: 3px solid var(--color-leaf-dark);
+  box-shadow: var(--shadow-button);
+}

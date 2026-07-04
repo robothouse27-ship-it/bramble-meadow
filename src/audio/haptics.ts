@@ -1,7 +1,15 @@
 // Light haptic feedback via the Vibration API. Supported on most Android
 // browsers; silently a no-op where unsupported (e.g. iOS Safari).
 
+let hapticsEnabled = true;
+
+/** Toggle vibration feedback. */
+export function setHapticsEnabled(v: boolean) {
+  hapticsEnabled = v;
+}
+
 function buzz(pattern: number | number[]) {
+  if (!hapticsEnabled) return;
   try {
     if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
       navigator.vibrate(pattern);

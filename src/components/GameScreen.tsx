@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { useGameStore } from "../state/gameStore";
 import { startAmbient, stopAmbient } from "../audio/ambient";
 import { Hud } from "./Hud/Hud";
@@ -7,6 +8,8 @@ import { Board } from "./Board/Board";
 import { NumberPad } from "./NumberPad/NumberPad";
 import { Controls } from "./Controls/Controls";
 import { Celebration } from "./Celebration/Celebration";
+import { PauseOverlay } from "./Pause/PauseOverlay";
+import { SettingsPanel } from "./Settings/SettingsPanel";
 import { ParticleField } from "../particles/ParticleField";
 
 export function GameScreen() {
@@ -20,23 +23,25 @@ export function GameScreen() {
   const combo = useGameStore((s) => s.combo);
   const idleNudge = useGameStore((s) => s.idleNudge);
   const ambientOn = useGameStore((s) => s.ambientOn);
+  const paused = useGameStore((s) => s.paused);
 
+  const [showSettings, setShowSettings] = useState(false);
   const boardCenterRef = useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
 
-  // ambient meadow soundscape while actively playing (respects the toggle)
+  // ambient meadow soundscape while actively playing (respects the toggle & pause)
   useEffect(() => {
-    if (status === "playing" && ambientOn) startAmbient();
+    if (status === "playing" && ambientOn && !paused) startAmbient();
     else stopAmbient();
     return () => stopAmbient();
-  }, [status, ambientOn]);
+  }, [status, ambientOn, paused]);
 
   // Pip gently pipes up after a stretch of inactivity. The timer resets on any
   // move (values), selection change, or status change.
   useEffect(() => {
-    if (status !== "playing") return;
+    if (status !== "playing" || paused) return;
     const t = setTimeout(idleNudge, 22000);
     return () => clearTimeout(t);
-  }, [values, selected, status, idleNudge]);
+  }, [values, selected, status, paused, idleNudge]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -66,12 +71,16 @@ export function GameScreen() {
         burstOrigin={boardCenterRef.current}
         burstCount={status === "won" ? 120 : Math.min(40 + combo * 14, 104)}
       />
-      <Hud />
+      <Hud onOpenSettings={() => setShowSettings(true)} />
       <BuddyPanel />
       <Board />
       <NumberPad />
       <Controls />
       <Celebration />
+      <PauseOverlay />
+      <AnimatePresence>
+        {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
+      </AnimatePresence>
     </div>
   );
 }

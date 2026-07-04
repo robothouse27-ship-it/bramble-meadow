@@ -9,8 +9,14 @@ import {
   type Difficulty,
   type Grid,
 } from "../engine/sudoku";
-import { playChime, playMistake, playPlace } from "../audio/sound";
-import { hapticError, hapticSuccess, hapticTap, hapticWin } from "../audio/haptics";
+import { playChime, playMistake, playPlace, setSoundEnabled } from "../audio/sound";
+import {
+  hapticError,
+  hapticSuccess,
+  hapticTap,
+  hapticWin,
+  setHapticsEnabled,
+} from "../audio/haptics";
 
 export type BuddyMood = "idle" | "thinking" | "happy" | "worried" | "celebrate";
 
@@ -21,6 +27,7 @@ export type CompletionEvent = {
 };
 
 const MAX_MISTAKES = 3;
+const MAX_HINTS = 3;
 
 type HistoryEntry = {
   values: Grid;
@@ -40,17 +47,25 @@ function emptyStats(): Stats {
 
 function recordOutcome(
   stats: Stats,
-  outcome: { win: boolean; difficulty: Difficulty | null; mistakes: number; ms: number },
+  outcome: {
+    win: boolean;
+    difficulty: Difficulty | null;
+    mistakes: number;
+    hints: number;
+    ms: number;
+  },
 ): Stats {
   const best = { ...stats.best };
-  if (outcome.win && outcome.difficulty) {
+  // best time only counts an honest solve (no hints)
+  if (outcome.win && outcome.difficulty && outcome.hints === 0) {
     const cur = best[outcome.difficulty];
     if (cur === null || outcome.ms < cur) best[outcome.difficulty] = outcome.ms;
   }
+  const flawless = outcome.win && outcome.mistakes === 0 && outcome.hints === 0;
   return {
     played: stats.played + 1,
     won: stats.won + (outcome.win ? 1 : 0),
-    flawless: stats.flawless + (outcome.win && outcome.mistakes === 0 ? 1 : 0),
+    flawless: stats.flawless + (flawless ? 1 : 0),
     best,
   };
 }
@@ -67,8 +82,12 @@ interface GameState {
   notesMode: boolean;
   mistakes: number;
   status: "menu" | "playing" | "won" | "lost";
+  paused: boolean;
   startedAt: number | null;
   elapsedMs: number;
+
+  hintsLeft: number;
+  hintsUsed: number;
 
   buddyMood: BuddyMood;
   buddyLine: string;
@@ -76,6 +95,9 @@ interface GameState {
   lastCompletion: CompletionEvent | null;
 
   ambientOn: boolean; // ambient meadow soundscape preference
+  soundOn: boolean; // chimes / place / mistake sound effects
+  hapticsOn: boolean; // vibration feedback
+  highlightPeers: boolean; // row/col/box + same-number highlighting
 
   stats: Stats;
 
@@ -94,11 +116,17 @@ interface GameState {
   eraseCell: () => void;
   toggleNotesMode: () => void;
   undo: () => void;
+  useHint: () => void;
   tick: () => void;
   setBuddy: (mood: BuddyMood, line?: string) => void;
   idleNudge: () => void;
   pokePip: () => void;
+  pauseGame: () => void;
+  resumeFromPause: () => void;
   toggleAmbient: () => void;
+  toggleSound: () => void;
+  toggleHaptics: () => void;
+  toggleHighlight: () => void;
   backToMenu: () => void;
 }
 
@@ -196,6 +224,14 @@ const ALMOST_LINES = [
   "The last few burrows are waiting!",
 ];
 
+const HINT_LINES = [
+  "Here — this little one belongs here. 🌱",
+  "Psst… try this burrow.",
+  "A gentle nudge from Pip.",
+  "That berry goes right there.",
+  "Let me help with that one, friend.",
+];
+
 const PIP_TAP_LINES = [
   "Hee! That tickles.",
   "Oh! Hello there.",
@@ -224,8 +260,12 @@ export const useGameStore = create<GameState>()(
       notesMode: false,
       mistakes: 0,
       status: "menu",
+      paused: false,
       startedAt: null,
       elapsedMs: 0,
+
+      hintsLeft: MAX_HINTS,
+      hintsUsed: 0,
 
       buddyMood: "idle",
       buddyLine: "Ready when you are.",
@@ -233,6 +273,9 @@ export const useGameStore = create<GameState>()(
       lastCompletion: null,
 
       ambientOn: true,
+      soundOn: true,
+      hapticsOn: true,
+      highlightPeers: true,
 
       stats: emptyStats(),
 
@@ -256,8 +299,11 @@ export const useGameStore = create<GameState>()(
           notesMode: false,
           mistakes: 0,
           status: "playing",
+          paused: false,
           startedAt: Date.now(),
           elapsedMs: 0,
+          hintsLeft: MAX_HINTS,
+          hintsUsed: 0,
           buddyMood: "idle",
           buddyLine: "A fresh puzzle! Let's begin.",
           combo: 0,
@@ -281,8 +327,11 @@ export const useGameStore = create<GameState>()(
           notesMode: false,
           mistakes: 0,
           status: "playing",
+          paused: false,
           startedAt: Date.now(),
           elapsedMs: 0,
+          hintsLeft: MAX_HINTS,
+          hintsUsed: 0,
           buddyMood: "idle",
           buddyLine: "Today's meadow awaits! 🌼",
           combo: 0,
@@ -295,7 +344,7 @@ export const useGameStore = create<GameState>()(
       resumeGame: () => {
         const s = get();
         if (s.puzzle && s.values) {
-          set({ status: "playing", startedAt: Date.now() - s.elapsedMs });
+          set({ status: "playing", paused: false, startedAt: Date.now() - s.elapsedMs });
         }
       },
 
@@ -318,7 +367,7 @@ export const useGameStore = create<GameState>()(
 
       eraseCell: () => {
         const s = get();
-        if (s.selected === null || !s.values || !s.givenMask) return;
+        if (s.paused || s.selected === null || !s.values || !s.givenMask) return;
         if (s.givenMask[s.selected]) return;
         const values = s.values.slice() as Grid;
         const notes = s.notes!.map((n) => n.slice());
@@ -335,7 +384,8 @@ export const useGameStore = create<GameState>()(
           !s.values ||
           !s.solution ||
           !s.givenMask ||
-          s.status !== "playing"
+          s.status !== "playing" ||
+          s.paused
         )
           return;
         const i = s.selected;
@@ -379,7 +429,7 @@ export const useGameStore = create<GameState>()(
             combo: 0,
             history: [...s.history, historyEntry].slice(-20),
             ...(lost
-              ? { stats: recordOutcome(s.stats, { win: false, difficulty: s.difficulty, mistakes, ms: finalMs }) }
+              ? { stats: recordOutcome(s.stats, { win: false, difficulty: s.difficulty, mistakes, hints: s.hintsUsed, ms: finalMs }) }
               : {}),
           });
           return;
@@ -449,7 +499,7 @@ export const useGameStore = create<GameState>()(
             : s.lastCompletion,
           history: [...s.history, historyEntry].slice(-20),
           ...(won
-            ? { stats: recordOutcome(s.stats, { win: true, difficulty: s.difficulty, mistakes: s.mistakes, ms: finalMs }) }
+            ? { stats: recordOutcome(s.stats, { win: true, difficulty: s.difficulty, mistakes: s.mistakes, hints: s.hintsUsed, ms: finalMs }) }
             : {}),
           ...dailyPatch,
         });
@@ -457,8 +507,29 @@ export const useGameStore = create<GameState>()(
 
       tick: () => {
         const s = get();
-        if (s.status !== "playing" || s.startedAt === null) return;
+        if (s.status !== "playing" || s.paused || s.startedAt === null) return;
         set({ elapsedMs: Date.now() - s.startedAt });
+      },
+
+      useHint: () => {
+        const s = get();
+        if (s.status !== "playing" || s.paused) return;
+        if (!s.values || !s.solution || !s.givenMask || s.hintsLeft <= 0) return;
+
+        // reveal the selected empty cell, else the first empty non-clue cell
+        let i = s.selected;
+        if (i === null || s.givenMask[i] || s.values[i] !== 0) {
+          i = s.values.findIndex((v, idx) => v === 0 && !s.givenMask![idx]);
+        }
+        if (i === null || i < 0) return;
+
+        const digit = s.solution[i];
+        set({ selected: i, hintsLeft: s.hintsLeft - 1, hintsUsed: s.hintsUsed + 1 });
+        // reuse the normal placement path (glow, chime, win/streak handling)
+        get().enterDigit(digit);
+        if (get().status === "playing") {
+          set({ buddyMood: "happy", buddyLine: pick(HINT_LINES) });
+        }
       },
 
       setBuddy: (mood, line) => set({ buddyMood: mood, ...(line ? { buddyLine: line } : {}) }),
@@ -475,7 +546,34 @@ export const useGameStore = create<GameState>()(
         set({ buddyMood: "happy", buddyLine: pick(PIP_TAP_LINES) });
       },
 
+      pauseGame: () => {
+        const s = get();
+        if (s.status !== "playing" || s.paused) return;
+        // freeze the clock at the exact moment of pausing
+        set({
+          paused: true,
+          elapsedMs: s.startedAt !== null ? Date.now() - s.startedAt : s.elapsedMs,
+        });
+      },
+
+      resumeFromPause: () => {
+        const s = get();
+        if (!s.paused) return;
+        set({ paused: false, startedAt: Date.now() - s.elapsedMs });
+      },
+
       toggleAmbient: () => set((s) => ({ ambientOn: !s.ambientOn })),
+      toggleSound: () =>
+        set((s) => {
+          setSoundEnabled(!s.soundOn);
+          return { soundOn: !s.soundOn };
+        }),
+      toggleHaptics: () =>
+        set((s) => {
+          setHapticsEnabled(!s.hapticsOn);
+          return { hapticsOn: !s.hapticsOn };
+        }),
+      toggleHighlight: () => set((s) => ({ highlightPeers: !s.highlightPeers })),
     }),
     {
       name: "bramble-meadow-save",
@@ -488,8 +586,14 @@ export const useGameStore = create<GameState>()(
         givenMask: s.givenMask,
         mistakes: s.mistakes,
         status: s.status,
+        paused: s.paused,
         elapsedMs: s.elapsedMs,
+        hintsLeft: s.hintsLeft,
+        hintsUsed: s.hintsUsed,
         ambientOn: s.ambientOn,
+        soundOn: s.soundOn,
+        hapticsOn: s.hapticsOn,
+        highlightPeers: s.highlightPeers,
         stats: s.stats,
         isDaily: s.isDaily,
         lastDailyDate: s.lastDailyDate,

@@ -191,9 +191,16 @@
   white-space: nowrap;
 }
 
-.menu-progress {
+.menu-footer-actions {
+  display: flex;
+  gap: 10px;
   margin-top: 18px;
-  padding: 10px 22px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.menu-progress {
+  padding: 10px 20px;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 15px;

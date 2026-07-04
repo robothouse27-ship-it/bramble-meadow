@@ -1,0 +1,68 @@
+.pause-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(40, 28, 20, 0.5);
+  backdrop-filter: blur(7px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 55;
+  padding: 20px;
+}
+
+.pause-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(180deg, #fffdf7, var(--color-paper-warm));
+  border-radius: var(--radius-xl);
+  padding: 26px 30px 24px;
+  width: min(86vw, 320px);
+  box-shadow: var(--shadow-card-lifted);
+  border: 3px solid var(--color-honey-light);
+  text-align: center;
+}
+
+.pause-title {
+  margin: 4px 0 0;
+  font-size: 23px;
+  color: var(--color-clue);
+}
+
+.pause-sub {
+  margin: 0 0 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+.pause-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.pause-btn {
+  padding: 12px 22px;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 15px;
+  background: linear-gradient(180deg, #fffdf7, var(--color-paper));
+  color: var(--color-ink-soft);
+  border: none;
+  border-bottom: 3px solid var(--color-ink-faint);
+  box-shadow: var(--shadow-button);
+}
+
+.pause-btn.primary {
+  background: linear-gradient(180deg, #97c56e, var(--color-leaf));
+  color: white;
+  border-bottom-color: var(--color-leaf-dark);
+}
+
+.pause-btn:active {
+  transform: translateY(3px);
+  box-shadow: var(--shadow-button-pressed);
+}

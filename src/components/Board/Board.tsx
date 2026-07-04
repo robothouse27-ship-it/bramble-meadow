@@ -11,6 +11,7 @@ export function Board() {
   const selected = useGameStore((s) => s.selected);
   const selectCell = useGameStore((s) => s.selectCell);
   const lastCompletion = useGameStore((s) => s.lastCompletion);
+  const highlightPeers = useGameStore((s) => s.highlightPeers);
 
   const conflicts = useMemo(() => (values ? getConflicts(values) : new Set<number>()), [values]);
 
@@ -37,7 +38,9 @@ export function Board() {
           const col = i % 9;
           const box = Math.floor(row / 3) * 3 + Math.floor(col / 3);
           const isPeer =
-            selected !== null && (row === selRow || col === selCol || box === selBox);
+            highlightPeers &&
+            selected !== null &&
+            (row === selRow || col === selCol || box === selBox);
           return (
             <Cell
               key={i}
@@ -46,7 +49,7 @@ export function Board() {
               isGiven={givenMask[i]}
               isSelected={selected === i}
               isPeer={isPeer && selected !== i}
-              isSameValue={selValue !== 0 && value === selValue && selected !== i}
+              isSameValue={highlightPeers && selValue !== 0 && value === selValue && selected !== i}
               isConflict={conflicts.has(i)}
               isGlowing={glowOrder.has(i)}
               glowOrder={glowOrder.get(i) ?? 0}

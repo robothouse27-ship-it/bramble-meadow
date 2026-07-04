@@ -1,4 +1,10 @@
 let ctx: AudioContext | null = null;
+let soundEnabled = true;
+
+/** Toggle sound effects (chimes / place / mistake). Ambient bed is separate. */
+export function setSoundEnabled(v: boolean) {
+  soundEnabled = v;
+}
 
 function getCtx(): AudioContext {
   if (!ctx) {
@@ -55,6 +61,7 @@ function tone(
  * completions climb a cheerful little scale.
  */
 export function playChime(level: "cell" | "line" | "win" = "cell", combo = 0) {
+  if (!soundEnabled) return;
   try {
     const bases = {
       cell: [523, 659],
@@ -73,6 +80,7 @@ export function playChime(level: "cell" | "line" | "win" = "cell", combo = 0) {
 
 /** A soft, short "plip" for placing a correct digit (no completion). */
 export function playPlace() {
+  if (!soundEnabled) return;
   try {
     tone(880, 0, 0.14, 0.06);
     tone(1174, 0.03, 0.12, 0.035);
@@ -82,6 +90,7 @@ export function playPlace() {
 }
 
 export function playMistake() {
+  if (!soundEnabled) return;
   try {
     tone(220, 0, 0.25, 0.1, "sine");
     tone(180, 0.1, 0.3, 0.08, "sine");

@@ -1,7 +1,7 @@
 .hud-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   width: min(88vw, 496px);
   margin-bottom: 14px;
   padding: 8px 10px 8px 8px;
@@ -35,16 +35,16 @@
 }
 
 .hud-timer {
+  margin-right: auto;
   font-weight: 800;
   color: var(--color-ink-soft);
   font-variant-numeric: tabular-nums;
 }
 
-.hud-sound {
-  margin-left: auto;
+.hud-icon-btn {
   width: 32px;
   height: 32px;
-  font-size: 15px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -54,15 +54,18 @@
   flex-shrink: 0;
   transition: transform 0.1s ease;
 }
-.hud-sound:active {
+.hud-icon-btn:active:not(:disabled) {
   transform: scale(0.9);
+}
+.hud-icon-btn:disabled {
+  opacity: 0.4;
 }
 
 .hud-berries {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-left: 8px;
+  margin-left: 4px;
 }
 
 .berry {

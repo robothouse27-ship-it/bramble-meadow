@@ -3,6 +3,7 @@ import { useState, type ReactElement } from "react";
 import { useGameStore, dayKey } from "../../state/gameStore";
 import type { Difficulty } from "../../engine/sudoku";
 import { StatsPanel } from "../Stats/StatsPanel";
+import { SettingsPanel } from "../Settings/SettingsPanel";
 import poster from "../../assets/scene/poster.png";
 import leaf from "../../assets/props/leaf.png";
 import "./menu.css";
@@ -112,6 +113,7 @@ export function Menu() {
   const lastDailyDate = useGameStore((s) => s.lastDailyDate);
   const dailyStreak = useGameStore((s) => s.dailyStreak);
   const [showStats, setShowStats] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const canResume = puzzle !== null && status === "menu" && difficulty !== null;
   const today = dayKey();
@@ -198,12 +200,18 @@ export function Menu() {
         ))}
       </div>
 
-      <button className="menu-progress" onClick={() => setShowStats(true)}>
-        🌿 Your progress
-      </button>
+      <div className="menu-footer-actions">
+        <button className="menu-progress" onClick={() => setShowStats(true)}>
+          🌿 Your progress
+        </button>
+        <button className="menu-progress" onClick={() => setShowSettings(true)}>
+          ⚙️ Settings
+        </button>
+      </div>
 
       <AnimatePresence>
         {showStats && <StatsPanel onClose={() => setShowStats(false)} />}
+        {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
       </AnimatePresence>
     </div>
   );

@@ -1,5 +1,8 @@
+import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useGameStore } from "./state/gameStore";
+import { setSoundEnabled } from "./audio/sound";
+import { setHapticsEnabled } from "./audio/haptics";
 import { Menu } from "./components/Menu/Menu";
 import { GameScreen } from "./components/GameScreen";
 import { Scene } from "./components/Scene/Scene";
@@ -7,7 +10,13 @@ import "./styles/global.css";
 
 export default function App() {
   const status = useGameStore((s) => s.status);
+  const soundOn = useGameStore((s) => s.soundOn);
+  const hapticsOn = useGameStore((s) => s.hapticsOn);
   const isMenu = status === "menu";
+
+  // apply persisted audio/haptic prefs to the (module-level) engines
+  useEffect(() => setSoundEnabled(soundOn), [soundOn]);
+  useEffect(() => setHapticsEnabled(hapticsOn), [hapticsOn]);
 
   return (
     <>

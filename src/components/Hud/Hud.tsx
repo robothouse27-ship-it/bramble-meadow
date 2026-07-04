@@ -13,14 +13,14 @@ function formatTime(ms: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-export function Hud() {
+export function Hud({ onOpenSettings }: { onOpenSettings: () => void }) {
   const elapsedMs = useGameStore((s) => s.elapsedMs);
   const mistakes = useGameStore((s) => s.mistakes);
   const tick = useGameStore((s) => s.tick);
   const difficulty = useGameStore((s) => s.difficulty);
   const backToMenu = useGameStore((s) => s.backToMenu);
-  const ambientOn = useGameStore((s) => s.ambientOn);
-  const toggleAmbient = useGameStore((s) => s.toggleAmbient);
+  const paused = useGameStore((s) => s.paused);
+  const pauseGame = useGameStore((s) => s.pauseGame);
 
   useEffect(() => {
     const id = setInterval(tick, 1000);
@@ -35,12 +35,15 @@ export function Hud() {
       <div className="hud-difficulty">{difficulty}</div>
       <div className="hud-timer">⏱ {formatTime(elapsedMs)}</div>
       <button
-        className="hud-sound"
-        onClick={toggleAmbient}
-        aria-label={ambientOn ? "Mute meadow sounds" : "Unmute meadow sounds"}
-        aria-pressed={ambientOn}
+        className="hud-icon-btn"
+        onClick={pauseGame}
+        disabled={paused}
+        aria-label="Pause"
       >
-        {ambientOn ? "🔊" : "🔇"}
+        ⏸
+      </button>
+      <button className="hud-icon-btn" onClick={onOpenSettings} aria-label="Settings">
+        ⚙️
       </button>
       <div className="hud-berries" aria-label={`${MAX_MISTAKES - mistakes} berries left`}>
         {Array.from({ length: MAX_MISTAKES }, (_, i) => {
