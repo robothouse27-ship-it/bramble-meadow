@@ -21,6 +21,7 @@ export function Hud({ onOpenSettings }: { onOpenSettings: () => void }) {
   const backToMenu = useGameStore((s) => s.backToMenu);
   const paused = useGameStore((s) => s.paused);
   const pauseGame = useGameStore((s) => s.pauseGame);
+  const zenMode = useGameStore((s) => s.zenMode);
 
   useEffect(() => {
     const id = setInterval(tick, 1000);
@@ -45,22 +46,28 @@ export function Hud({ onOpenSettings }: { onOpenSettings: () => void }) {
       <button className="hud-icon-btn" onClick={onOpenSettings} aria-label="Settings">
         ⚙️
       </button>
-      <div className="hud-berries" aria-label={`${MAX_MISTAKES - mistakes} berries left`}>
-        {Array.from({ length: MAX_MISTAKES }, (_, i) => {
-          const alive = i < MAX_MISTAKES - mistakes;
-          return (
-            <motion.img
-              key={i}
-              src={berry}
-              alt=""
-              draggable={false}
-              className={`berry ${alive ? "" : "berry-lost"}`}
-              animate={alive ? { scale: [1, 1.3, 1] } : { scale: 0.85, opacity: 0.35 }}
-              transition={{ duration: 0.3 }}
-            />
-          );
-        })}
-      </div>
+      {zenMode ? (
+        <div className="hud-zen" aria-label="Zen mode — no mistake limit" title="Zen mode">
+          🍃
+        </div>
+      ) : (
+        <div className="hud-berries" aria-label={`${MAX_MISTAKES - mistakes} berries left`}>
+          {Array.from({ length: MAX_MISTAKES }, (_, i) => {
+            const alive = i < MAX_MISTAKES - mistakes;
+            return (
+              <motion.img
+                key={i}
+                src={berry}
+                alt=""
+                draggable={false}
+                className={`berry ${alive ? "" : "berry-lost"}`}
+                animate={alive ? { scale: [1, 1.3, 1] } : { scale: 0.85, opacity: 0.35 }}
+                transition={{ duration: 0.3 }}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -58,6 +58,19 @@
   border-bottom-color: var(--color-leaf-dark);
 }
 
+/* number-first: the currently armed digit, ready to drop into cells */
+.number-key.armed {
+  background: linear-gradient(180deg, #ffe6a8, var(--color-honey));
+  border-bottom-color: var(--color-entry);
+  color: #fff;
+  box-shadow: 0 0 0 2px var(--color-honey), var(--shadow-button);
+  transform: translateY(-1px);
+}
+
+.number-key.armed .key-remaining {
+  color: #fff8e6;
+}
+
 /* all nine of this digit placed — a calm, satisfied "done" look */
 .number-key.done {
   opacity: 0.72;

@@ -68,6 +68,13 @@
   margin-left: 4px;
 }
 
+.hud-zen {
+  margin-left: 4px;
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .berry {
   width: 22px;
   height: 22px;

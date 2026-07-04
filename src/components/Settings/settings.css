@@ -35,6 +35,21 @@
   margin-bottom: 20px;
 }
 
+.settings-section {
+  text-align: left;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--color-ink-soft);
+  margin: 6px 2px -2px;
+}
+
+.settings-section:first-child {
+  margin-top: 0;
+}
+
 .setting-row {
   display: flex;
   align-items: center;

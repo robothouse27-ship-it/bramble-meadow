@@ -79,6 +79,7 @@ interface GameState {
   givenMask: boolean[] | null; // true = pre-filled clue, not editable
 
   selected: number | null;
+  activeDigit: number | null; // number-first input: the digit armed for placing
   notesMode: boolean;
   mistakes: number;
   status: "menu" | "playing" | "won" | "lost";
@@ -98,6 +99,9 @@ interface GameState {
   soundOn: boolean; // chimes / place / mistake sound effects
   hapticsOn: boolean; // vibration feedback
   highlightPeers: boolean; // row/col/box + same-number highlighting
+  autoCleanNotes: boolean; // placing a digit clears it from peer pencil notes
+  numberFirst: boolean; // tap a number, then tap cells to place it
+  zenMode: boolean; // no 3-berry fail; cozy solving
 
   stats: Stats;
 
@@ -112,6 +116,7 @@ interface GameState {
   startDaily: () => void;
   resumeGame: () => void;
   selectCell: (i: number) => void;
+  setActiveDigit: (digit: number | null) => void;
   enterDigit: (digit: number) => void;
   eraseCell: () => void;
   toggleNotesMode: () => void;
@@ -123,10 +128,15 @@ interface GameState {
   pokePip: () => void;
   pauseGame: () => void;
   resumeFromPause: () => void;
+  restartPuzzle: () => void;
+  newPuzzle: () => void;
   toggleAmbient: () => void;
   toggleSound: () => void;
   toggleHaptics: () => void;
   toggleHighlight: () => void;
+  toggleAutoCleanNotes: () => void;
+  toggleNumberFirst: () => void;
+  toggleZen: () => void;
   backToMenu: () => void;
 }
 
@@ -257,6 +267,7 @@ export const useGameStore = create<GameState>()(
       givenMask: null,
 
       selected: null,
+      activeDigit: null,
       notesMode: false,
       mistakes: 0,
       status: "menu",
@@ -276,6 +287,9 @@ export const useGameStore = create<GameState>()(
       soundOn: true,
       hapticsOn: true,
       highlightPeers: true,
+      autoCleanNotes: true,
+      numberFirst: false,
+      zenMode: false,
 
       stats: emptyStats(),
 
@@ -296,6 +310,7 @@ export const useGameStore = create<GameState>()(
           notes: emptyNotes(),
           givenMask: puzzle.map((v) => v !== 0),
           selected: null,
+          activeDigit: null,
           notesMode: false,
           mistakes: 0,
           status: "playing",
@@ -324,6 +339,7 @@ export const useGameStore = create<GameState>()(
           notes: emptyNotes(),
           givenMask: puzzle.map((v) => v !== 0),
           selected: null,
+          activeDigit: null,
           notesMode: false,
           mistakes: 0,
           status: "playing",
@@ -351,6 +367,8 @@ export const useGameStore = create<GameState>()(
       backToMenu: () => set({ status: "menu" }),
 
       selectCell: (i) => set({ selected: i }),
+
+      setActiveDigit: (digit) => set({ activeDigit: digit }),
 
       toggleNotesMode: () => set((s) => ({ notesMode: !s.notesMode })),
 
@@ -418,7 +436,7 @@ export const useGameStore = create<GameState>()(
           playMistake();
           hapticError();
           const mistakes = s.mistakes + 1;
-          const lost = mistakes >= MAX_MISTAKES;
+          const lost = !s.zenMode && mistakes >= MAX_MISTAKES;
           set({
             values,
             notes,
@@ -433,6 +451,15 @@ export const useGameStore = create<GameState>()(
               : {}),
           });
           return;
+        }
+
+        // auto-clean pencil notes: remove the placed digit from peers' notes
+        if (s.autoCleanNotes) {
+          const peers = linesForCell(i);
+          for (const p of [...peers.row, ...peers.col, ...peers.box]) {
+            const at = notes[p].indexOf(digit);
+            if (at >= 0) notes[p].splice(at, 1);
+          }
         }
 
         // clear conflicts check just for safety/highlighting elsewhere
@@ -562,6 +589,42 @@ export const useGameStore = create<GameState>()(
         set({ paused: false, startedAt: Date.now() - s.elapsedMs });
       },
 
+      // replay the same puzzle from scratch
+      restartPuzzle: () => {
+        const s = get();
+        if (!s.puzzle) return;
+        set({
+          values: s.puzzle.slice() as Grid,
+          notes: emptyNotes(),
+          givenMask: s.puzzle.map((v) => v !== 0),
+          selected: null,
+          activeDigit: null,
+          notesMode: false,
+          mistakes: 0,
+          status: "playing",
+          paused: false,
+          startedAt: Date.now(),
+          elapsedMs: 0,
+          hintsLeft: MAX_HINTS,
+          hintsUsed: 0,
+          combo: 0,
+          lastCompletion: null,
+          history: [],
+          buddyMood: "idle",
+          buddyLine: "A fresh start — you've got this.",
+        });
+      },
+
+      // fresh puzzle at the current difficulty (dailies just restart)
+      newPuzzle: () => {
+        const s = get();
+        if (s.isDaily) {
+          get().restartPuzzle();
+        } else if (s.difficulty) {
+          get().startGame(s.difficulty);
+        }
+      },
+
       toggleAmbient: () => set((s) => ({ ambientOn: !s.ambientOn })),
       toggleSound: () =>
         set((s) => {
@@ -574,6 +637,10 @@ export const useGameStore = create<GameState>()(
           return { hapticsOn: !s.hapticsOn };
         }),
       toggleHighlight: () => set((s) => ({ highlightPeers: !s.highlightPeers })),
+      toggleAutoCleanNotes: () => set((s) => ({ autoCleanNotes: !s.autoCleanNotes })),
+      toggleNumberFirst: () =>
+        set((s) => ({ numberFirst: !s.numberFirst, activeDigit: null })),
+      toggleZen: () => set((s) => ({ zenMode: !s.zenMode })),
     }),
     {
       name: "bramble-meadow-save",
@@ -594,6 +661,9 @@ export const useGameStore = create<GameState>()(
         soundOn: s.soundOn,
         hapticsOn: s.hapticsOn,
         highlightPeers: s.highlightPeers,
+        autoCleanNotes: s.autoCleanNotes,
+        numberFirst: s.numberFirst,
+        zenMode: s.zenMode,
         stats: s.stats,
         isDaily: s.isDaily,
         lastDailyDate: s.lastDailyDate,

@@ -40,10 +40,16 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const ambientOn = useGameStore((s) => s.ambientOn);
   const hapticsOn = useGameStore((s) => s.hapticsOn);
   const highlightPeers = useGameStore((s) => s.highlightPeers);
+  const autoCleanNotes = useGameStore((s) => s.autoCleanNotes);
+  const numberFirst = useGameStore((s) => s.numberFirst);
+  const zenMode = useGameStore((s) => s.zenMode);
   const toggleSound = useGameStore((s) => s.toggleSound);
   const toggleAmbient = useGameStore((s) => s.toggleAmbient);
   const toggleHaptics = useGameStore((s) => s.toggleHaptics);
   const toggleHighlight = useGameStore((s) => s.toggleHighlight);
+  const toggleAutoCleanNotes = useGameStore((s) => s.toggleAutoCleanNotes);
+  const toggleNumberFirst = useGameStore((s) => s.toggleNumberFirst);
+  const toggleZen = useGameStore((s) => s.toggleZen);
 
   return (
     <motion.div
@@ -64,6 +70,33 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         <h2 className="settings-title">⚙️ Settings</h2>
 
         <div className="settings-list">
+          <div className="settings-section">Playing</div>
+          <Toggle
+            label="Auto-tidy notes"
+            hint="Placing a number clears it from nearby pencil marks"
+            on={autoCleanNotes}
+            onToggle={toggleAutoCleanNotes}
+          />
+          <Toggle
+            label="Number-first tapping"
+            hint="Tap a number, then tap cells to place it"
+            on={numberFirst}
+            onToggle={toggleNumberFirst}
+          />
+          <Toggle
+            label="Zen mode"
+            hint="Relax — no three-berry limit, just cozy solving"
+            on={zenMode}
+            onToggle={toggleZen}
+          />
+          <Toggle
+            label="Highlights"
+            hint="Glow the row, column & matching numbers"
+            on={highlightPeers}
+            onToggle={toggleHighlight}
+          />
+
+          <div className="settings-section">Sound &amp; feel</div>
           <Toggle
             label="Sound effects"
             hint="Chimes as you place & complete"
@@ -81,12 +114,6 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             hint="Little buzzes on your device"
             on={hapticsOn}
             onToggle={toggleHaptics}
-          />
-          <Toggle
-            label="Highlights"
-            hint="Glow the row, column & matching berries"
-            on={highlightPeers}
-            onToggle={toggleHighlight}
           />
         </div>
 

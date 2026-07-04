@@ -6,7 +6,10 @@ import "./pause.css";
 export function PauseOverlay() {
   const paused = useGameStore((s) => s.paused);
   const status = useGameStore((s) => s.status);
+  const isDaily = useGameStore((s) => s.isDaily);
   const resumeFromPause = useGameStore((s) => s.resumeFromPause);
+  const restartPuzzle = useGameStore((s) => s.restartPuzzle);
+  const newPuzzle = useGameStore((s) => s.newPuzzle);
   const backToMenu = useGameStore((s) => s.backToMenu);
 
   if (!paused || status !== "playing") return null;
@@ -32,6 +35,14 @@ export function PauseOverlay() {
           </button>
           <button className="pause-btn" onClick={backToMenu}>
             Menu
+          </button>
+        </div>
+        <div className="pause-actions pause-actions-sub">
+          <button className="pause-btn small" onClick={restartPuzzle}>
+            ↺ Restart
+          </button>
+          <button className="pause-btn small" onClick={newPuzzle}>
+            {isDaily ? "↺ Reset daily" : "🌱 New puzzle"}
           </button>
         </div>
       </motion.div>

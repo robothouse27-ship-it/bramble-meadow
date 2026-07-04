@@ -10,8 +10,17 @@ export function Board() {
   const notes = useGameStore((s) => s.notes);
   const selected = useGameStore((s) => s.selected);
   const selectCell = useGameStore((s) => s.selectCell);
+  const enterDigit = useGameStore((s) => s.enterDigit);
   const lastCompletion = useGameStore((s) => s.lastCompletion);
   const highlightPeers = useGameStore((s) => s.highlightPeers);
+  const numberFirst = useGameStore((s) => s.numberFirst);
+  const activeDigit = useGameStore((s) => s.activeDigit);
+
+  const handleCell = (i: number) => {
+    selectCell(i);
+    // number-first: tapping a cell drops the armed digit straight in
+    if (numberFirst && activeDigit !== null) enterDigit(activeDigit);
+  };
 
   const conflicts = useMemo(() => (values ? getConflicts(values) : new Set<number>()), [values]);
 
@@ -55,7 +64,7 @@ export function Board() {
               glowOrder={glowOrder.get(i) ?? 0}
               glowKey={lastCompletion?.id ?? 0}
               notes={notes[i]}
-              onClick={selectCell}
+              onClick={handleCell}
             />
           );
         })}
