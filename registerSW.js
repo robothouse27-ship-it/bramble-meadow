@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/bramble-meadow/sw.js', { scope: '/bramble-meadow/' })})}
