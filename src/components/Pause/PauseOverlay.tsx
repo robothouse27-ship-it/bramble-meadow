@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useGameStore } from "../../state/gameStore";
-import { Pip } from "../Buddy/Pip";
+import { Buddy } from "../Buddy/Buddy";
+import { BUDDY_META } from "../Buddy/buddyArt";
 import "./pause.css";
 
 export function PauseOverlay() {
@@ -11,6 +12,7 @@ export function PauseOverlay() {
   const restartPuzzle = useGameStore((s) => s.restartPuzzle);
   const newPuzzle = useGameStore((s) => s.newPuzzle);
   const backToMenu = useGameStore((s) => s.backToMenu);
+  const buddyName = useGameStore((s) => BUDDY_META[s.buddy].name);
 
   if (!paused || status !== "playing") return null;
 
@@ -26,9 +28,9 @@ export function PauseOverlay() {
         animate={{ scale: 1, y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
       >
-        <Pip mood="idle" size={96} />
+        <Buddy mood="idle" size={96} />
         <h2 className="pause-title">Meadow paused</h2>
-        <p className="pause-sub">Pip will wait right here. 🌿</p>
+        <p className="pause-sub">{buddyName} will wait right here. 🌿</p>
         <div className="pause-actions">
           <button className="pause-btn primary" onClick={resumeFromPause}>
             Resume

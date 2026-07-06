@@ -20,6 +20,10 @@ import {
 
 export type BuddyMood = "idle" | "thinking" | "happy" | "worried" | "celebrate";
 
+// Selectable companion characters. "pip" is the original hedgehog; the others
+// are alternate woodland buddies sharing the same 5-mood art set.
+export type BuddyId = "pip" | "clover" | "nutmeg" | "fox" | "owl";
+
 export type CompletionEvent = {
   id: number;
   kind: "row" | "col" | "box";
@@ -92,6 +96,7 @@ interface GameState {
 
   buddyMood: BuddyMood;
   buddyLine: string;
+  buddy: BuddyId; // which companion character is shown
   combo: number; // consecutive clean line/box completions
   lastCompletion: CompletionEvent | null;
 
@@ -124,6 +129,7 @@ interface GameState {
   useHint: () => void;
   tick: () => void;
   setBuddy: (mood: BuddyMood, line?: string) => void;
+  setBuddyId: (id: BuddyId) => void;
   idleNudge: () => void;
   pokePip: () => void;
   pauseGame: () => void;
@@ -280,6 +286,7 @@ export const useGameStore = create<GameState>()(
 
       buddyMood: "idle",
       buddyLine: "Ready when you are.",
+      buddy: "pip",
       combo: 0,
       lastCompletion: null,
 
@@ -560,6 +567,7 @@ export const useGameStore = create<GameState>()(
       },
 
       setBuddy: (mood, line) => set({ buddyMood: mood, ...(line ? { buddyLine: line } : {}) }),
+      setBuddyId: (id) => set({ buddy: id }),
 
       idleNudge: () => {
         const s = get();
@@ -669,6 +677,7 @@ export const useGameStore = create<GameState>()(
         lastDailyDate: s.lastDailyDate,
         dailyStreak: s.dailyStreak,
         bestStreak: s.bestStreak,
+        buddy: s.buddy,
       }),
     }
   )

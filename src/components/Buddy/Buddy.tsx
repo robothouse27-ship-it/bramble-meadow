@@ -1,24 +1,13 @@
 import { useEffect } from "react";
 import { motion, useAnimationControls, type TargetAndTransition, type Transition } from "framer-motion";
-import type { BuddyMood } from "../../state/gameStore";
-import pipIdle from "../../assets/buddy/pip-idle.png";
-import pipThinking from "../../assets/buddy/pip-thinking.png";
-import pipHappy from "../../assets/buddy/pip-happy.png";
-import pipWorried from "../../assets/buddy/pip-worried.png";
-import pipCelebrate from "../../assets/buddy/pip-celebrate.png";
+import { useGameStore, type BuddyId, type BuddyMood } from "../../state/gameStore";
+import { buddyArt, BUDDY_META } from "./buddyArt";
 
-interface PipProps {
+interface BuddyProps {
   mood: BuddyMood;
   size?: number;
+  buddy?: BuddyId; // defaults to the player's selected companion
 }
-
-const art: Record<BuddyMood, string> = {
-  idle: pipIdle,
-  thinking: pipThinking,
-  happy: pipHappy,
-  worried: pipWorried,
-  celebrate: pipCelebrate,
-};
 
 const bodyVariants: Record<BuddyMood, TargetAndTransition> = {
   idle: { scale: 1, rotate: 0, y: [0, -4, 0] },
@@ -44,7 +33,10 @@ const STRETCH: TargetAndTransition = {
   y: [0, -10, 0],
 };
 
-export function Pip({ mood, size = 140 }: PipProps) {
+export function Buddy({ mood, size = 140, buddy }: BuddyProps) {
+  const selected = useGameStore((s) => s.buddy);
+  const id = buddy ?? selected;
+  const meta = BUDDY_META[id];
   const controls = useAnimationControls();
 
   useEffect(() => {
@@ -78,8 +70,8 @@ export function Pip({ mood, size = 140 }: PipProps) {
 
   return (
     <motion.img
-      src={art[mood]}
-      alt={`Pip the hedgehog looking ${mood}`}
+      src={buddyArt[id][mood]}
+      alt={`${meta.name} the ${meta.species} looking ${mood}`}
       draggable={false}
       style={{
         height: size,

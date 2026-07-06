@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useGameStore } from "../../state/gameStore";
-import { Pip } from "../Buddy/Pip";
+import { Buddy } from "../Buddy/Buddy";
 import signBoard from "../../assets/props/sign-board.png";
 import sparkles from "../../assets/props/sparkles.png";
 import "./celebration.css";
@@ -61,7 +61,7 @@ export function Celebration() {
           </span>
         </div>
 
-        <Pip mood={won ? "celebrate" : "worried"} size={110} />
+        <Buddy mood={won ? "celebrate" : "worried"} size={110} />
 
         {won ? (
           <p className="celebration-stats">

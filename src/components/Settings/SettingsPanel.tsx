@@ -1,6 +1,34 @@
 import { motion } from "framer-motion";
 import { useGameStore } from "../../state/gameStore";
+import { BUDDIES, buddyArt } from "../Buddy/buddyArt";
 import "./settings.css";
+
+function BuddyPicker() {
+  const selected = useGameStore((s) => s.buddy);
+  const setBuddyId = useGameStore((s) => s.setBuddyId);
+  return (
+    <div className="buddy-picker" role="radiogroup" aria-label="Choose your companion">
+      {BUDDIES.map((b) => {
+        const active = b.id === selected;
+        return (
+          <motion.button
+            key={b.id}
+            type="button"
+            className={`buddy-choice ${active ? "active" : ""}`}
+            role="radio"
+            aria-checked={active}
+            aria-label={`${b.name} the ${b.species}`}
+            onClick={() => setBuddyId(b.id)}
+            whileTap={{ scale: 0.92 }}
+          >
+            <img src={buddyArt[b.id].idle} alt="" draggable={false} />
+            <span className="buddy-choice-name">{b.name}</span>
+          </motion.button>
+        );
+      })}
+    </div>
+  );
+}
 
 function Toggle({
   label,
@@ -70,6 +98,9 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         <h2 className="settings-title">⚙️ Settings</h2>
 
         <div className="settings-list">
+          <div className="settings-section">Companion</div>
+          <BuddyPicker />
+
           <div className="settings-section">Playing</div>
           <Toggle
             label="Auto-tidy notes"

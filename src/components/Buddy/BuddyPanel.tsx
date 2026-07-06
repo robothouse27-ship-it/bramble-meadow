@@ -1,12 +1,14 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useGameStore } from "../../state/gameStore";
-import { Pip } from "./Pip";
+import { Buddy } from "./Buddy";
+import { BUDDY_META } from "./buddyArt";
 import "./buddy.css";
 
 export function BuddyPanel() {
   const mood = useGameStore((s) => s.buddyMood);
   const line = useGameStore((s) => s.buddyLine);
   const pokePip = useGameStore((s) => s.pokePip);
+  const name = useGameStore((s) => BUDDY_META[s.buddy].name);
 
   return (
     <div className="buddy-panel">
@@ -15,9 +17,9 @@ export function BuddyPanel() {
         className="buddy-pip-btn"
         onClick={pokePip}
         whileTap={{ scale: 0.9, rotate: -6 }}
-        aria-label="Pet Pip"
+        aria-label={`Pet ${name}`}
       >
-        <Pip mood={mood} size={88} />
+        <Buddy mood={mood} size={88} />
       </motion.button>
       <AnimatePresence mode="wait">
         <motion.div
